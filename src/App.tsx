@@ -6,7 +6,7 @@ import { FileList } from './components/FileList/FileList'
 
 
 function App() {
-  const { setFile, updateFileName, zipFiles } = useZipFile()
+  const { setFile, updateFileName, copyFile, zipFiles } = useZipFile()
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -21,7 +21,7 @@ function App() {
 
         {
           zipFiles.length > 0
-            ? <FileList files={zipFiles} updateFileName={updateFileName} />
+            ? <FileList files={zipFiles} updateFileName={updateFileName} copyFile={copyFile}/>
             : (
               <div className='h-full'>
                 <Label htmlFor='zipFile' className='block text-center text-2xl p-4'>Upload a zip file</Label>

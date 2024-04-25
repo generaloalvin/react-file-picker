@@ -26,7 +26,20 @@ export const useZipFile = () => {
     const updateFileName = useCallback((index: number, newFileName: string) => {
         setZipFiles(prev => {
             const newFiles = [...prev];
-            newFiles[index].file_name = newFileName;
+            newFiles[index] = { // creating a new object to avoid updating copies of the object via pass by reference
+                file: newFiles[index].file,
+                file_extension: newFiles[index].file_extension,
+                file_parent_folder: newFiles[index].file_parent_folder,
+                file_name: newFileName,
+            };
+            return newFiles;
+        })
+    }, [])
+
+    const copyFile = useCallback((index: number) => {
+        setZipFiles(prev => {
+            const newFiles = [...prev];
+            newFiles.splice(index, 0, newFiles[index]);
             return newFiles;
         })
     }, [])
@@ -34,6 +47,7 @@ export const useZipFile = () => {
     return { 
         setFile,
         updateFileName,
+        copyFile,
         zipFiles,
     }
 }

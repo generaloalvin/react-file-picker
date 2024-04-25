@@ -9,9 +9,10 @@ import { Input } from "../ui/input"
 export interface IFileListProps {
     files: IZipFile[]
     updateFileName?: ((index: number, newFileName: string) => void)
+    copyFile?: ((index: number) => void)
 }
 
-export const FileList = ({ files, updateFileName }: IFileListProps) => {
+export const FileList = ({ files, updateFileName, copyFile }: IFileListProps) => {
     const [renamingIndex, setRenamingIndex] = useState<number | null>(null)
     const [newFileName, setNewFileName] = useState<string>("")
 
@@ -21,6 +22,14 @@ export const FileList = ({ files, updateFileName }: IFileListProps) => {
             setNewFileName(file.file_name)
         }
     } ,[])
+
+    const handleCopy = useCallback((i: number) => {
+        return () => {
+            if (copyFile) {
+                copyFile(i)
+            }
+        }
+    }, [])
 
     const handleRename = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setNewFileName(e.target.value)
@@ -62,7 +71,10 @@ export const FileList = ({ files, updateFileName }: IFileListProps) => {
         }
 
         return (
-            <Button onClick={handleInitiateRename(file, i)} className="mr-2 bg-blue-500">Rename</Button>
+            <div>
+                <Button onClick={handleInitiateRename(file, i)} className="mr-2 bg-blue-500">Rename</Button>
+                <Button onClick={handleCopy(i)} className="bg-slate-400">Copy</Button>
+            </div>
         )
     }
 
