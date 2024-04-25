@@ -23,7 +23,19 @@ export const useZipFile = () => {
         });
     }, [])
 
-    return { setFile, zipFiles }
+    const updateFileName = useCallback((index: number, newFileName: string) => {
+        setZipFiles(prev => {
+            const newFiles = [...prev];
+            newFiles[index].file_name = newFileName;
+            return newFiles;
+        })
+    }, [])
+
+    return { 
+        setFile,
+        updateFileName,
+        zipFiles,
+    }
 }
 
 export type useZipFileType = ReturnType<typeof useZipFile>;
