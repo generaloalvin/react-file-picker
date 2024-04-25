@@ -13,3 +13,5 @@ export const useZipFile = () => {
 
     return { setFile, zipFiles }
 }
+
+export type useZipFileType = ReturnType<typeof useZipFile>;

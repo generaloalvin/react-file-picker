@@ -17,7 +17,7 @@ function App() {
   return (
     <div className="flex justify-center items-center w-screen h-screen">
       {/* BOX CONTAINER */}
-      <div className="w-3/4 h-3/4 bg-gray-200 rounded-lg shadow-xl">
+      <div className="w-3/4 h-3/4 bg-gray-200 rounded-lg shadow-xl max-h-3/4 overflow-y-auto">
 
         {
           zipFiles.length > 0

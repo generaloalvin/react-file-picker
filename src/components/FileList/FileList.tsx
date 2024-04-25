@@ -1,14 +1,30 @@
 import JSZip from "jszip"
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 
 
 export interface IFileListProps {
     files: JSZip.JSZipObject[]
 }
 
-export const FileList = ({files}: IFileListProps) => {
+export const FileList = ({ files }: IFileListProps) => {
     return (
-        <div>
-            File List
-        </div>
+        <Table className="max-h-full">
+            <TableCaption>Files of the Zipped Folder</TableCaption>
+            <TableHeader>
+                <TableRow>
+                    <TableHead className="w-[100px]">File Name</TableHead>
+                    
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {
+                    files.map((file, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{file.name}</TableCell>
+                        </TableRow>
+                    ))
+                }
+            </TableBody>
+        </Table>
     )
 }
