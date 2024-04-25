@@ -1,9 +1,10 @@
-import JSZip from "jszip"
+import { generateFullPathFileName } from "@/lib/utils"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
+import { IZipFile } from "@/lib/zip"
 
 
 export interface IFileListProps {
-    files: JSZip.JSZipObject[]
+    files: IZipFile[]
 }
 
 export const FileList = ({ files }: IFileListProps) => {
@@ -13,14 +14,13 @@ export const FileList = ({ files }: IFileListProps) => {
             <TableHeader>
                 <TableRow>
                     <TableHead className="w-[100px]">File Name</TableHead>
-                    
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {
                     files.map((file, index) => (
                         <TableRow key={index}>
-                            <TableCell>{file.name}</TableCell>
+                            <TableCell>{generateFullPathFileName(file)}</TableCell>
                         </TableRow>
                     ))
                 }

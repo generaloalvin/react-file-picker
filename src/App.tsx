@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
-import { useZipFile } from './lib/extractor'
+import { useZipFile } from './lib/zip'
 import { FileList } from './components/FileList/FileList'
 
 
@@ -30,7 +30,6 @@ function App() {
             )
         }
       </div>
-
       {/* END BOX CONTAINER */}
     </div>
   )
