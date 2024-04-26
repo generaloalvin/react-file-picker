@@ -29,7 +29,7 @@ export const FileList = ({ files, updateFileName, copyFile }: IFileListProps) =>
                 copyFile(i)
             }
         }
-    }, [])
+    }, [files])
 
     const handleRename = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setNewFileName(e.target.value)
@@ -41,7 +41,7 @@ export const FileList = ({ files, updateFileName, copyFile }: IFileListProps) =>
         }
         setRenamingIndex(null)
         setNewFileName("")
-    }, [newFileName, renamingIndex, updateFileName])
+    }, [newFileName, renamingIndex, updateFileName, files])
 
     const handleCancelRename = useCallback(() => {
         setRenamingIndex(null)
