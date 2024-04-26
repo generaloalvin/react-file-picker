@@ -1,6 +1,6 @@
 import JsZip from 'jszip';
 import { useState } from 'react';
-import { generateFullPathFileName } from './utils';
+import { generateFullPathFileName, sleep } from './utils';
 import { saveAs } from 'file-saver'
 
 export interface IZipFile {
@@ -15,8 +15,8 @@ export interface IZipFile {
 export const useZipFile = () => {
     const [zipFiles, setZipFiles] = useState<IZipFile[]>([]);
     const [copyTracker, setCopyTracker] = useState<{ [key: string]: number }>({})
-
-    console.log('Copy Tracker', copyTracker)
+    const [isSaving, setIsSaving] = useState(false)
+    const [progress, setProgress] = useState(0)
 
     const updateCopyTracker = (fileName: string) => {
         setCopyTracker((prev) => {
@@ -113,8 +113,13 @@ export const useZipFile = () => {
         let zip = new JsZip()
 
         console.log('ZipFiles', zipFiles)
+        setIsSaving(true)
+        setProgress(0)
+        await sleep(500) // to give time for the progress bar to update
 
-        for (const zipFile of zipFiles) {
+        for (let i = 0; i < zipFiles.length; i++) {
+            setProgress(((i + 1)/zipFiles.length) * 100)
+            const zipFile = zipFiles[i]
             const completeFileName = generateFullPathFileName(zipFile)
 
             const data: ArrayBuffer | undefined = zipFile.is_new
@@ -127,6 +132,7 @@ export const useZipFile = () => {
         }
 
         saveAs(await zip.generateAsync({ type: 'blob' }))
+        setIsSaving(false)
     }
 
     return {
@@ -136,6 +142,8 @@ export const useZipFile = () => {
         addFile,
         saveAsZip,
         zipFiles,
+        progress,
+        isSaving,
     }
 }
 

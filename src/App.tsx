@@ -3,10 +3,11 @@ import { Label } from './components/ui/label'
 import { useZipFile } from './lib/zip'
 import { FileList } from './components/FileList/FileList'
 import { Button } from './components/ui/button'
+import { Progress } from './components/ui/progress'
 
 
 function App() {
-  const { setFile, updateFileName, copyFile, addFile, saveAsZip, zipFiles } = useZipFile()
+  const { setFile, updateFileName, copyFile, addFile, saveAsZip, zipFiles, progress } = useZipFile()
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -61,6 +62,7 @@ function App() {
         zipFiles.length > 0
           ? (
             <div className='flex w-3/4 justify-end'>
+              <Progress value={progress}/>
               <Button onClick={handleSave} className='bg-green-700 '>
                 Save File
               </Button>

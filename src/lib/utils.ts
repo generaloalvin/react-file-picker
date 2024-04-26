@@ -13,3 +13,9 @@ export function generateFullPathFileName(file: IZipFile) {
 
   return `${file.file_parent_folder}/${file.file_name}.${file.file_extension}`
 }
+
+export const sleep = (t: number): Promise<void> => {
+  return new Promise((res) => {
+    setTimeout(() => res(), t)
+  })
+}
