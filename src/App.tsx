@@ -7,7 +7,7 @@ import { Progress } from './components/ui/progress'
 
 
 function App() {
-  const { setFile, updateFileName, copyFile, addFile, saveAsZip, zipFiles, progress } = useZipFile()
+  const { setFile, updateFileName, copyFile, addFile, saveAsZip, pauseZipping, resumeZipping, progress, isPaused, isSaving, zipFiles } = useZipFile()
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -24,12 +24,57 @@ function App() {
   const handleSave = () => {
     saveAsZip()
       .then(() => {
-        console.log('New Zip File Saved.')
+        
       })
       .catch((e) => {
         console.error(e)
         alert('An error occurred while saving the zip file.')
       })
+  }
+
+  const handlePause = () => {
+    pauseZipping()
+  }
+
+  const handleResume = () => {
+    resumeZipping()
+  }
+
+  const renderBottom = () => {
+    if (zipFiles.length === 0) return null
+
+    const saveButton = (
+      <Button onClick={handleSave} className='bg-green-700 '>
+        Save File
+      </Button>
+    )
+
+    const pauseButton = (
+      <Button onClick={handlePause} className='bg-yellow-400'>
+        Pause
+      </Button>
+    )
+
+    const resumeButton = (
+      <Button onClick={handleResume} className='bg-emerald-400'>
+        Resume
+      </Button>
+    )
+
+    return (
+      <div className='flex w-3/4 justify-end gap-5'>
+        <Progress value={progress} />
+        {
+          !isSaving && !isPaused
+            ? saveButton
+            : isSaving && !isPaused
+              ? pauseButton
+              : isSaving && isPaused
+                ? resumeButton
+                : null
+        }
+      </div>
+    )
   }
 
   return (
@@ -58,18 +103,7 @@ function App() {
         }
       </div>
       {/* END BOX CONTAINER */}
-      {
-        zipFiles.length > 0
-          ? (
-            <div className='flex w-3/4 justify-end gap-5'>
-              <Progress value={progress}/>
-              <Button onClick={handleSave} className='bg-green-700 '>
-                Save File
-              </Button>
-            </div>
-          )
-          : null
-      }
+      {renderBottom()}
 
     </div>
   )

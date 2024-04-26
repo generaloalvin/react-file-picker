@@ -1,7 +1,8 @@
 import JsZip from 'jszip';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generateFullPathFileName, sleep } from './utils';
 import { saveAs } from 'file-saver'
+import { useInterval, useCounter } from 'react-timing-hooks'
 
 export interface IZipFile {
     file_name: string;
@@ -12,12 +13,39 @@ export interface IZipFile {
     new_file?: File
 }
 
+let zip: JsZip = new JsZip()
+
 export const useZipFile = () => {
     const [zipFiles, setZipFiles] = useState<IZipFile[]>([]);
     const [copyTracker, setCopyTracker] = useState<{ [key: string]: number }>({})
     const [isSaving, setIsSaving] = useState(false)
-    const [isPaused, setIsPause] = useState(false)
     const [progress, setProgress] = useState(0)
+    const [counter, setCounter] = useState(0)
+    const { isPaused, isStopped, pause: pauseZipping, resume: resumeZipping, start: startZipping, stop:stopZipping } = useInterval(() => {
+        setCounter(prev => prev + 1)
+    }, 1000)
+
+    useEffect(() => {
+        const isCounterStarted = !isPaused && !isStopped
+
+        if (counter === zipFiles.length && zipFiles.length > 0 && isSaving && isCounterStarted) {
+            stopZipping()
+            zip.generateAsync({ type: 'blob' })
+                .then(data => {
+                    saveAs(data)
+                    setIsSaving(false)
+                    console.log('New Zip File Saved.')
+                })
+            return
+        }
+
+        if (isCounterStarted) {
+            console.log('Ziping %d', counter)
+            updateZip(counter)
+                .then(() => {})
+        }
+
+    }, [counter, isPaused, isStopped, zipFiles, isSaving])
 
     const updateCopyTracker = (fileName: string) => {
         setCopyTracker((prev) => {
@@ -110,30 +138,46 @@ export const useZipFile = () => {
         })
     }
 
+    const updateZip = async (i: number) => {
+        setProgress(((i + 1) / zipFiles.length) * 100)
+        const zipFile = zipFiles[i]
+        const completeFileName = generateFullPathFileName(zipFile)
+
+        const data: ArrayBuffer | undefined = zipFile.is_new
+            ? await zipFile.new_file?.arrayBuffer()
+            : await zipFile.file?.async('arraybuffer')
+
+        zip.file(completeFileName, data!)
+    }
+
     const saveAsZip = async () => {
-        let zip = new JsZip()
+        // let zip = new JsZip()
 
         console.log('ZipFiles', zipFiles)
         setIsSaving(true)
         setProgress(0)
+        setCounter(0)
+        zip = new JsZip()
         await sleep(500) // to give time for the progress bar to update
 
-        for (let i = 0; i < zipFiles.length; i++) {
-            setProgress(((i + 1) / zipFiles.length) * 100)
-            const zipFile = zipFiles[i]
-            const completeFileName = generateFullPathFileName(zipFile)
+        // for (let i = 0; i < zipFiles.length; i++) {
+            // setProgress(((i + 1) / zipFiles.length) * 100)
+            // const zipFile = zipFiles[i]
+            // const completeFileName = generateFullPathFileName(zipFile)
 
-            const data: ArrayBuffer | undefined = zipFile.is_new
-                ? await zipFile.new_file?.arrayBuffer()
-                : await zipFile.file?.async('arraybuffer')
+            // const data: ArrayBuffer | undefined = zipFile.is_new
+            //     ? await zipFile.new_file?.arrayBuffer()
+            //     : await zipFile.file?.async('arraybuffer')
 
-            console.log('Data', completeFileName, data)
+            // console.log('Data', completeFileName, data)
 
-            zip = zip.file(completeFileName, data!)
-        }
+            // zip.file(completeFileName, data!)
+        // }
 
-        saveAs(await zip.generateAsync({ type: 'blob' }))
-        setIsSaving(false)
+        startZipping()
+
+        // saveAs(await zip.generateAsync({ type: 'blob' }))
+        // setIsSaving(false)
     }
 
     return {
@@ -142,9 +186,12 @@ export const useZipFile = () => {
         copyFile,
         addFile,
         saveAsZip,
+        pauseZipping,
+        resumeZipping,
         zipFiles,
         progress,
         isSaving,
+        isPaused,
     }
 }
 
