@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
 import { useZipFile } from './lib/zip'
@@ -9,19 +8,19 @@ import { Button } from './components/ui/button'
 function App() {
   const { setFile, updateFileName, copyFile, addFile, saveAsZip, zipFiles } = useZipFile()
 
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0])
     }
-  }, [])
+  }
 
-  const handleNewFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNewFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       addFile(e.target.files[0])
     }
-  }, [])
+  }
 
-  const handleSave = useCallback(() => {
+  const handleSave = () => {
     saveAsZip()
       .then(() => {
         console.log('New Zip File Saved.')
@@ -30,7 +29,7 @@ function App() {
         console.error(e)
         alert('An error occurred while saving the zip file.')
       })
-  }, [zipFiles])
+  }
 
   return (
     <div className="flex flex-col gap-1 justify-center items-center w-screen h-screen">

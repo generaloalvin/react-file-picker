@@ -2,7 +2,7 @@ import { generateFullPathFileName } from "@/lib/utils"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { IZipFile } from "@/lib/zip"
 import { Button } from "../ui/button"
-import React, { useCallback, useState } from "react"
+import React, { useState } from "react"
 import { Input } from "../ui/input"
 
 
@@ -16,36 +16,36 @@ export const FileList = ({ files, updateFileName, copyFile }: IFileListProps) =>
     const [renamingIndex, setRenamingIndex] = useState<number | null>(null)
     const [newFileName, setNewFileName] = useState<string>("")
 
-    const handleInitiateRename = useCallback((file: IZipFile, i: number) => {
+    const handleInitiateRename = (file: IZipFile, i: number) => {
         return () => {
             setRenamingIndex(i)
             setNewFileName(file.file_name)
         }
-    } ,[])
+    }
 
-    const handleCopy = useCallback((i: number) => {
+    const handleCopy = (i: number) => {
         return () => {
             if (copyFile) {
                 copyFile(i)
             }
         }
-    }, [files])
+    }
 
-    const handleRename = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleRename = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewFileName(e.target.value)
-    }, [])
+    }
 
-    const handleSaveRename = useCallback(() => {
+    const handleSaveRename = () => {
         if (updateFileName && renamingIndex !== null) {
             updateFileName(renamingIndex, newFileName)
         }
         setRenamingIndex(null)
         setNewFileName("")
-    }, [newFileName, renamingIndex, updateFileName, files])
+    }
 
-    const handleCancelRename = useCallback(() => {
+    const handleCancelRename = () => {
         setRenamingIndex(null)
-    }, [])
+    }
 
     const renderFileCell = (file: IZipFile, i: number) => {
         if (renamingIndex === i) { // we are renaming the file so show an input

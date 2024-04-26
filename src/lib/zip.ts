@@ -82,7 +82,7 @@ export const useZipFile = () => {
                 file: newFiles[index].file,
                 file_extension: newFiles[index].file_extension,
                 file_parent_folder: newFiles[index].file_parent_folder,
-                file_name: newFiles[index].file_name + ` (${copyTracker[generateFullPathFileName(newFiles[index])] ?? 1})`,
+                file_name: newFiles[index].file_name + ` (${copyTracker[generateFullPathFileName(newFiles[index])] ?? 0})`,
                 is_new: newFiles[index].is_new,
                 new_file: newFiles[index].new_file,
 
