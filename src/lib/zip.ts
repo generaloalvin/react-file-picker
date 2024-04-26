@@ -1,8 +1,8 @@
 import JsZip from 'jszip';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { generateFullPathFileName, sleep } from './utils';
 import { saveAs } from 'file-saver'
-import { useInterval, useCounter } from 'react-timing-hooks'
+import { useInterval } from 'react-timing-hooks'
 
 export interface IZipFile {
     file_name: string;
@@ -23,7 +23,19 @@ export const useZipFile = () => {
     const [counter, setCounter] = useState(0)
     const { isPaused, isStopped, pause: pauseZipping, resume: resumeZipping, start: startZipping, stop:stopZipping } = useInterval(() => {
         setCounter(prev => prev + 1)
-    }, 1000)
+    }, 200)
+
+    const updateZip = useCallback(async (i: number) => {
+        setProgress(((i + 1) / zipFiles.length) * 100)
+        const zipFile = zipFiles[i]
+        const completeFileName = generateFullPathFileName(zipFile)
+
+        const data: ArrayBuffer | undefined = zipFile.is_new
+            ? await zipFile.new_file?.arrayBuffer()
+            : await zipFile.file?.async('arraybuffer')
+
+        zip.file(completeFileName, data!)
+    }, [zipFiles])
 
     useEffect(() => {
         const isCounterStarted = !isPaused && !isStopped
@@ -45,7 +57,7 @@ export const useZipFile = () => {
                 .then(() => {})
         }
 
-    }, [counter, isPaused, isStopped, zipFiles, isSaving])
+    }, [counter, isPaused, isStopped, zipFiles, isSaving, stopZipping, updateZip])
 
     const updateCopyTracker = (fileName: string) => {
         setCopyTracker((prev) => {
@@ -138,17 +150,7 @@ export const useZipFile = () => {
         })
     }
 
-    const updateZip = async (i: number) => {
-        setProgress(((i + 1) / zipFiles.length) * 100)
-        const zipFile = zipFiles[i]
-        const completeFileName = generateFullPathFileName(zipFile)
-
-        const data: ArrayBuffer | undefined = zipFile.is_new
-            ? await zipFile.new_file?.arrayBuffer()
-            : await zipFile.file?.async('arraybuffer')
-
-        zip.file(completeFileName, data!)
-    }
+    
 
     const saveAsZip = async () => {
         // let zip = new JsZip()
