@@ -61,7 +61,7 @@ function App() {
       {
         zipFiles.length > 0
           ? (
-            <div className='flex w-3/4 justify-end'>
+            <div className='flex w-3/4 justify-end gap-5'>
               <Progress value={progress}/>
               <Button onClick={handleSave} className='bg-green-700 '>
                 Save File

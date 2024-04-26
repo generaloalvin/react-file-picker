@@ -16,6 +16,7 @@ export const useZipFile = () => {
     const [zipFiles, setZipFiles] = useState<IZipFile[]>([]);
     const [copyTracker, setCopyTracker] = useState<{ [key: string]: number }>({})
     const [isSaving, setIsSaving] = useState(false)
+    const [isPaused, setIsPause] = useState(false)
     const [progress, setProgress] = useState(0)
 
     const updateCopyTracker = (fileName: string) => {
@@ -23,7 +24,7 @@ export const useZipFile = () => {
             const newCopyTracker = { ...prev }
 
             if (newCopyTracker[fileName] !== undefined) {
-    
+
                 newCopyTracker[fileName] = newCopyTracker[fileName] + 1
             } else {
                 newCopyTracker[fileName] = 1
@@ -48,7 +49,7 @@ export const useZipFile = () => {
     const updateFileName = (index: number, newFileName: string) => {
         const isFileNameAlreadyExists = zipFiles.some((file, i) => {
             if (i === index) return false
-            
+
             return file.file_parent_folder === zipFiles[i].file_parent_folder
                 && newFileName === zipFiles[i].file_name
                 && file.file_extension === zipFiles[i].file_extension
@@ -118,7 +119,7 @@ export const useZipFile = () => {
         await sleep(500) // to give time for the progress bar to update
 
         for (let i = 0; i < zipFiles.length; i++) {
-            setProgress(((i + 1)/zipFiles.length) * 100)
+            setProgress(((i + 1) / zipFiles.length) * 100)
             const zipFile = zipFiles[i]
             const completeFileName = generateFullPathFileName(zipFile)
 
