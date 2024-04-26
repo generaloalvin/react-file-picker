@@ -7,5 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function generateFullPathFileName(file: IZipFile) {
+  if(file.file_parent_folder === "") {
+    return `${file.file_name}.${file.file_extension}`
+  }
+
   return `${file.file_parent_folder}/${file.file_name}.${file.file_extension}`
 }

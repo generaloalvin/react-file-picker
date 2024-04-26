@@ -1,5 +1,7 @@
 import JsZip from 'jszip';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
+import { generateFullPathFileName } from './utils';
+import { saveAs } from 'file-saver'
 
 export interface IZipFile {
     file_name: string;
@@ -13,7 +15,7 @@ export interface IZipFile {
 export const useZipFile = () => {
     const [zipFiles, setZipFiles] = useState<IZipFile[]>([]);
 
-    const setFile = useCallback((file: File) => {
+    const setFile = (file: File) => {
         JsZip.loadAsync(file).then((zip) => {
             console.log('zip files', zip.files)
             setZipFiles(Object.values(zip.files).map(file => ({
@@ -23,9 +25,9 @@ export const useZipFile = () => {
                 file
             })))
         });
-    }, [])
+    }
 
-    const updateFileName = useCallback((index: number, newFileName: string) => {
+    const updateFileName = (index: number, newFileName: string) => {
         setZipFiles(prev => {
             const newFiles = [...prev];
             newFiles[index] = { // creating a new object to avoid updating copies of the object via pass by reference
@@ -39,17 +41,17 @@ export const useZipFile = () => {
             };
             return newFiles;
         })
-    }, [])
+    }
 
-    const copyFile = useCallback((index: number) => {
+    const copyFile = (index: number) => {
         setZipFiles(prev => {
             const newFiles = [...prev];
             newFiles.splice(index, 0, newFiles[index]);
             return newFiles;
         })
-    }, [])
+    }
 
-    const addFile = useCallback((newFile: File) => {
+    const addFile = (newFile: File) => {
         setZipFiles(prev => {
             const newFiles = [...prev];
             newFiles.push({
@@ -62,13 +64,34 @@ export const useZipFile = () => {
             });
             return newFiles;
         })
-    }, [])
+    }
 
-    return { 
+    const saveAsZip = async () => {
+        let zip = new JsZip()
+
+        console.log('ZipFiles', zipFiles)
+
+        for (const zipFile of zipFiles) {
+            const completeFileName = generateFullPathFileName(zipFile)
+
+            const data: ArrayBuffer | undefined = zipFile.is_new
+                ? await zipFile.new_file?.arrayBuffer()
+                : await zipFile.file?.async('arraybuffer')
+
+            console.log('Data', completeFileName, data)
+
+            zip = zip.file(completeFileName, data!)
+        }
+
+        saveAs(await zip.generateAsync({type: 'blob'}))
+    }
+
+    return {
         setFile,
         updateFileName,
         copyFile,
         addFile,
+        saveAsZip,
         zipFiles,
     }
 }
