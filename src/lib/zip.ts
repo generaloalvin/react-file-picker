@@ -5,7 +5,9 @@ export interface IZipFile {
     file_name: string;
     file_extension: string;
     file_parent_folder: string;
-    file: JsZip.JSZipObject;
+    file?: JsZip.JSZipObject;
+    is_new?: boolean
+    new_file?: File
 }
 
 export const useZipFile = () => {
@@ -31,6 +33,9 @@ export const useZipFile = () => {
                 file_extension: newFiles[index].file_extension,
                 file_parent_folder: newFiles[index].file_parent_folder,
                 file_name: newFileName,
+                is_new: newFiles[index].is_new,
+                new_file: newFiles[index].new_file,
+
             };
             return newFiles;
         })
@@ -44,10 +49,26 @@ export const useZipFile = () => {
         })
     }, [])
 
+    const addFile = useCallback((newFile: File) => {
+        setZipFiles(prev => {
+            const newFiles = [...prev];
+            newFiles.push({
+                file_name: newFile.name.split('.').shift() || '',
+                file_extension: newFile.name.split('.').pop() || '',
+                file_parent_folder: '',
+                is_new: true,
+                new_file: newFile
+
+            });
+            return newFiles;
+        })
+    }, [])
+
     return { 
         setFile,
         updateFileName,
         copyFile,
+        addFile,
         zipFiles,
     }
 }
